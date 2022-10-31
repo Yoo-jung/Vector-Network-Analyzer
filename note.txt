@@ -55,3 +55,55 @@ DISPlay:WINDow4:TRACe4:FEED 'Trc4'
 // Check the result on the local screen
 // Go to local
 SYSTem:DISPlay:UPDate ONCE
+
+
+
+
+// 1. One channel, two traces, one diagram
+// Reset the instrument, creating the default trace Trc1 in channel 1.
+// The default measured quantity is the forward transmission S-parameter S21.
+// The default format is dB Mag.
+*RST
+// Create a second trace in channel 1, assign the format Phase,
+// and display the new trace in the same diagram.
+// the trace becomes the active trace but is not displayed
+CALCulate1:PARameter:SDEFine 'Trc2', 'S21'
+// the trace is referenced by the channel suffix 1
+CALCulate1:FORMat PHASe
+// display the second trace, numbering it the second trace in diagram no. 1
+DISPlay:WINDow1:TRACe2:FEED 'Trc2'
+// Check the result on the local screen
+// Go to local
+SYSTem:DISPlay:UPDate ONCE
+// 2. One channel, two traces, two diagrams
+// Create a second diagram, assign Trc2 to the new area, and remove it
+// from the first area.
+DISPlay:WINDow2:STATe ON
+DISPlay:WINDow2:TRACe2:FEED 'Trc2'
+// Trc2 is now displayed in both diagrams
+DISPlay:WINDow1:TRACe2:DELete
+// Check the result on the local screen
+// Go to local
+SYSTem:DISPlay:UPDate ONCE
+// 3. One channel, four traces, four diagrams
+// Reset the instrument, add diagrams no. 2, 3, 4.
+*RST; :DISPlay:WINDow2:STATe ON
+DISPlay:WINDow3:STATe ON
+DISPlay:WINDow4:STATe ON
+// Assign the reflection parameter S11 to the default trace.
+:CALCulate1:PARameter:MEASure 'Trc1', 'S11'
+// Assign the remaining S-parameters to new traces Trc2, Trc3, Tr4;
+// select the Smith chart format for the reflection parameters.
+CALCulate1:FORMat SMITh // Smith chart for the active trace Trc1
+CALCulate1:PARameter:SDEFine 'Trc2', 'S21'
+CALCulate1:PARameter:SDEFine 'Trc3', 'S12'
+CALCulate1:PARameter:SDEFine 'Trc4', 'S22'
+// Smith chart for the active trace Trc4, referenced by the channel number
+CALCulate1:FORMat SMITh
+// Display the new traces in diagrams no. 2 to 4.
+DISPlay:WINDow2:TRACe2:FEED 'Trc2'
+DISPlay:WINDow3:TRACe3:FEED 'Trc3'
+DISPlay:WINDow4:TRACe4:FEED 'Trc4'
+// Check the result on the local screen
+// Go to local
+SYSTem:DISPlay:UPDate ONCE
