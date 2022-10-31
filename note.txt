@@ -1,0 +1,57 @@
+############# Save Screen shot ############
+#select frile format
+#(WMF | GDI | EWMF | BMP | PNG | JPEG | JPG | PDF | SVG | DOC | RTF)
+###VNA.write("HCOP:DEV:LANG PNG")
+
+#Set print to file
+VNA.wirte('HCOP:DEST "MMEM"')
+
+#file path/name on instrument
+VNA.write('MMEM:NAME "C:\Temp\hcopy.png')
+
+#create schreenshot
+VNA.write("HCOP:IMM")
+
+PCfilePath = r'c:\Temp\hcopy.png'
+query = 'MMEM:DATA?\'c:\\temp\\hcopy.png\''
+
+# ask for file data from instrument and save to local hard drive
+fileData = VNA.query_binary_values(query, datatype='s')[0]
+newFile = open(PCfilePath, "wb")
+newFile.write(fileData)
+newFile.close()
+
+VNA.close()
+
+
+
+
+
+############# Contorl the notepad to use os ###########
+import os
+os.system('notepad')
+
+
+
+// 3. One channel, four traces, four diagrams
+// Reset the instrument, add diagrams no. 2, 3, 4.
+*RST; :DISPlay:WINDow2:STATe ON
+DISPlay:WINDow3:STATe ON
+DISPlay:WINDow4:STATe ON
+// Assign the reflection parameter S11 to the default trace.
+:CALCulate1:PARameter:MEASure 'Trc1', 'S11'
+// Assign the remaining S-parameters to new traces Trc2, Trc3, Tr4;
+// select the Smith chart format for the reflection parameters.
+CALCulate1:FORMat SMITh // Smith chart for the active trace Trc1
+CALCulate1:PARameter:SDEFine 'Trc2', 'S21'
+CALCulate1:PARameter:SDEFine 'Trc3', 'S12'
+CALCulate1:PARameter:SDEFine 'Trc4', 'S22'
+// Smith chart for the active trace Trc4, referenced by the channel number
+CALCulate1:FORMat SMITh
+// Display the new traces in diagrams no. 2 to 4.
+DISPlay:WINDow2:TRACe2:FEED 'Trc2'
+DISPlay:WINDow3:TRACe3:FEED 'Trc3'
+DISPlay:WINDow4:TRACe4:FEED 'Trc4'
+// Check the result on the local screen
+// Go to local
+SYSTem:DISPlay:UPDate ONCE
