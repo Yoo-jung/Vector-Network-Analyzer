@@ -1,8 +1,9 @@
 import pyvisa
 import time
 import os
+from Setting import *
 
-filepath = "./data.csv"
+filepath = "/home/keti-kvm/DATA/mesured_data.csv"
 
 F_start = 2.39 # start frequency in GHz
 F_stop = 2.41 # stop frequency in GHz
@@ -20,17 +21,11 @@ VNA_timeout = 10000.0  # VNA's timeout (ms) should be sufficiently large to allo
 #contect to VNA
 rm = pyvisa. ResourceManager()
 VNA = rm.open_resource('PCTIP:169.254.250.133::INSTR')
-#Set tiem out - 10 Seconds
-VNA.timeout = 10000
-
-VNA.write("*RST") # Reset
-VNA.write("*CLS") # Clear Status
-
 print(VNA.query('*IDN?')) # IDNUMBER
 
-VNA.write("INIT:CONT OFF")
-VNA.write("INIT")
-VNA.query("*OPC?") # Operation Complete
+#VNA.write("INIT:CONT OFF")
+#VNA.write("INIT")
+#VNA.query("*OPC?") # Operation Complete
 
 #Check the error queue
 print(VNA.query("SYST:ERR?"))
@@ -61,27 +56,66 @@ print(VNA.query("SYST:ERR?"))
 VNA.close()
 
 
-
-
-
-
-
 #Run the test
-phase = 0
-while phase <= 7:
-    VNA.write()
-    sleep(2)
-    phase_Measured = float('')
-    
-    #Write results to a file
-    with open(filepath, "a") as file:
-        if os.stat(filepath).st_size == 0: #if empty file, wrute a nice header
-            file.write("Setpoint [Deg], [dB], Measured [Deg], [dB]\n")
-        file.write("{:12.2f}, {:13.2f}\n".format(phase, phase_Measured))
-    file.close()
-    
-    phase += 1
+phase_Measured = float(VNA.query("CALC:PAR:MEAS? 'Ch1Tr1'"))
+power_Measured = float(VNA.query("CALC:PAR:MEAS? 'Ch1Tr2'"))
 
+# Controll Pin
+GPIO.output(P_or_S, GPIO.LOW)
+GPIO.output(OPT, GPIO.LOW)
+print("Start to control GPIO")
+for PIN_HIGH_P in range(0, 6, 1):
+    #print(PIN_HIGH_P)    
+    if PIN_HIGH_P == 0:
+        PIN_HIGH_P = 22
+    elif PIN_HIGH_P == 1:
+        PIN_HIGH_P = 10
+    elif PIN_HIGH_P == 2:
+        PIN_HIGH_P = 9
+    elif PIN_HIGH_P == 3:
+        PIN_HIGH_P = 11
+    elif PIN_HIGH_P == 4:
+        PIN_HIGH_P = 0     
+    elif PIN_HIGH_P == 5:
+        PIN_HIGH_P = 5
+    elif PIN_HIGH_P == 6:
+        PIN_HIGH_P = 6
+    elif PIN_HIGH_P == 7:
+        PIN_HIGH_P = 13
+        
+    for PIN_HIGH_A in range(0, 6, 1):
+        #print(PIN_HIGH_A)  
+        if PIN_HIGH_A == 0:
+            PIN_HIGH_A = 14
+        elif PIN_HIGH_A == 1:
+            PIN_HIGH_A = 15
+        elif PIN_HIGH_A == 2:
+            PIN_HIGH_A = 18
+        elif PIN_HIGH_A == 3:
+            PIN_HIGH_A = 23
+        elif PIN_HIGH_A == 4:
+            PIN_HIGH_A = 24
+        elif PIN_HIGH_A == 5:
+            PIN_HIGH_A = 25
+        elif PIN_HIGH_A == 6:
+            PIN_HIGH_A = 8
+        
+        time.sleep(5)
+        for pin in pins_P:
+            GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+        for pin in pins_A:
+            GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+            
+        GPIO.output(PIN_HIGH_P, GPIO.HIGH)
+        GPIO.output(PIN_HIGH_A, GPIO.HIGH)
+        print("GPIO "+str(PIN_HIGH_P)+" & "+str(PIN_HIGH_A)+" set HIGH")
 
+        
+        #Write results to a file
+        with open(filepath, "a") as file:
+            if os.stat(filepath).st_size == 0: #if empty file, wrute a nice header
+                file.write("Setpoint [Deg], [dB], Measured [Deg], [dB]\n")
+            file.write("{}, {}, {:12.2f}, {:13.2f}\n".format(PIN_HIGH_P, PIN_HIGH_A, phase_Measured, power_Measured))
+        file.close()
 
 
