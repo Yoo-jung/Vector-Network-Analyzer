@@ -7,7 +7,6 @@ from Setting import *
 rm = pyvisa. ResourceManager()
 VNA = rm.open_resource('TCPIP::169.254.250.133::INSTR')
 print(VNA.query('*IDN?')) # IDNUMBER
-
 time.sleep(1)
 filepath = "./mesured_data.csv"
 
