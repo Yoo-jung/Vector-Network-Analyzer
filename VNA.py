@@ -15,7 +15,6 @@ filepath = "./mesured_data.csv"
 print(VNA.query("SYST:ERR?"))
 time.sleep(1)
 
-
 #-----------------------------------------------
 # Setting GPIO Pin
 # reset
