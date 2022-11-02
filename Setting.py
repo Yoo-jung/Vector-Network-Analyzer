@@ -2,8 +2,8 @@
 PS = 0  #Phase
 PW = 0  #Power
 
+#PE44820
 P_or_S = 26
-
 OPT = 19
 D0 = 22
 D1 = 10
